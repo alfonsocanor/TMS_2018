@@ -1,0 +1,4 @@
+Test.py has the information about how it looks better to get the information for create
+a beta TMS. A dinamic routing based on addresses.
+
+What do I need, the Lat and look and fix the URL to copy automatically the information that it's took from google maps and the key from the API
