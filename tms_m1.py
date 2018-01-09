@@ -53,7 +53,7 @@ class GoogleMapsInfo(FileCheck):
                 else:
                     lat = getInfo[0]['geometry']['location']['lat']
                     lng = getInfo[0]['geometry']['location']['lng']
-                with open(os.path.join(os.path.dirname(__file__), 'latLngInfo.txt'), 'a') as Y:
+                with open(os.path.join(os.path.dirname(__file__), 'latLngInfo08012018.txt'), 'a') as Y:
                     if row[aux0] == 'client_id':
                         Y = csv.writer(Y, delimiter=',')
                         Y.writerow([str(row[aux0]), str(row[aux1]), str(row[aux2]), str(row[aux3]), 'Latitude', 'Longitude'])
