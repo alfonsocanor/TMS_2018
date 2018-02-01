@@ -3,6 +3,26 @@
 
 <html>
 <head>
+
+        <title>Simple Map</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+        <style>
+          /* Always set the map height explicitly to define the size of the div
+           * element that contains the map. */
+          #map {
+            height: 100%;
+          }
+          /* Optional: Makes the sample page fill the window. */
+          html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+          }
+        </style>
+
+
+
     <style>
         table, th, td {
             background: #f5f5f5;
@@ -57,19 +77,20 @@
 </table>
 
 {% if ifHTMLConditional %}
+
+<form method='POST' action="{{ url_for('routing') }}">
+{{ test.csrf_token }}
 <table>
     <tr>
-        <th>Id_</th>
         <th>Name</th>
         <th>Meters</th>
     </tr>
     {% for i in returnFromObjectClassRoute %}
     <tr>
     <td>
-        {{ i[0] }}
-    </td>
-    <td>
+        <input type="radio" name="returnFromObjectClassRoute" value="{{i}}">        
         {{ i[1] }}
+
     </td>
     <td>
         {{ i[2] }}
@@ -77,7 +98,28 @@
   </tr>
     {% endfor %}
     </table>
+<input type="submit" action="submit">
 {% endif %}
+
+</form>
+
+
+<div id="map"></div>
+<script>
+  function initMap() {
+    // Create a map object and specify the DOM element for display.
+    var map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: -34.596362, lng: -58.420977},
+      zoom: 15, 
+    });
+  }
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMwXuzxKO2EY2eoNX163Iojydhmi39i1U&callback=initMap" async defer></script>
+
+
+
+
 </body>
 
 </html>

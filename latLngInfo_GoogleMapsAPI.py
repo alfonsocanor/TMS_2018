@@ -10,23 +10,21 @@ key = 'AIzaSyBMwXuzxKO2EY2eoNX163Iojydhmi39i1U' #googleMaps API key - Userd in c
 class FileCheck():
     def __init__(self, fileName):
         self.fileName = fileName
-        with open(os.path.join(os.path.dirname(__file__), self.fileName)) as X:
-            pass
 
     def orderField(self):
-        with open(os.path.join(os.path.dirname(__file__), self.fileName)) as X:
-            X = X.readline()
-            X = X.replace('\n', '')
-            X = X.split(',')
-            for column in X:
+        with open(os.path.join(os.path.dirname(__file__), self.fileName)) as mainFileInformation:
+            mainFileInformation = mainFileInformation.readline()
+            mainFileInformation = mainFileInformation.replace('\n', '')
+            mainFileInformation = mainFileInformation.split(',')
+            for column in mainFileInformation:
                 if column == 'client_id':
-                    self.client_id = X.index(column)
+                    self.client_id = mainFileInformation.index(column)
                 elif column == 'client':
-                    self.client = X.index(column)
+                    self.client = mainFileInformation.index(column)
                 elif column == 'addressNumber':
-                    self.addressNumber = X.index(column)
+                    self.addressNumber = mainFileInformation.index(column)
                 elif column == 'address':
-                    self.address = X.index(column)
+                    self.address = mainFileInformation.index(column)
             return self.client_id, self.client, self.addressNumber, self.address #This returns a tupla
 
 class GoogleMapsInfo(FileCheck):
@@ -37,32 +35,29 @@ class GoogleMapsInfo(FileCheck):
         self.fields = FileCheck(self.fileName)
         self.addressLatLng = self.fields.orderField()
 
-        aux0 = self.addressLatLng[0] #client_id Comes from the tupla orderFields from class FileCheck
-        aux1 = self.addressLatLng[1] #client Comes from the tupla orderFields from class FileCheck
-        aux2 = self.addressLatLng[2] #addressNumber Comes from the tupla orderFields from class FileCheck
-        aux3 = self.addressLatLng[3] #address Comes from the tupla orderFields from class FileCheck
+        client_id = self.addressLatLng[0] #client_id Comes from the tupla orderFields from class FileCheck
+        client = self.addressLatLng[1] #client Comes from the tupla orderFields from class FileCheck
+        addressNumber = self.addressLatLng[2] #addressNumber Comes from the tupla orderFields from class FileCheck
+        address = self.addressLatLng[3] #address Comes from the tupla orderFields from class FileCheck
 
-        with open(os.path.join(os.path.dirname(__file__), self.fileName)) as X: #X Random named
-            X = csv.reader(X)
-            for row in X:
+        with open(os.path.join(os.path.dirname(__file__), self.fileName)) as mainFileInformation: #X Random named
+            mainFileInformation = csv.reader(mainFileInformation)
+            for row in mainFileInformation:
                 print(row)
                 gmaps = googlemaps.Client(key='AIzaSyBMwXuzxKO2EY2eoNX163Iojydhmi39i1U') #From googlaMaps API
-                getInfo = gmaps.geocode(row[aux3]) #Getting latitude and longitude from an address
+                getInfo = gmaps.geocode(row[address]) #Getting latitude and longitude from an address
                 if getInfo == []:
                     pass
                 else:
                     lat = getInfo[0]['geometry']['location']['lat']
                     lng = getInfo[0]['geometry']['location']['lng']
-                with open(os.path.join(os.path.dirname(__file__), 'latLngInfo08012018.txt'), 'a') as Y:
-                    if row[aux0] == 'client_id':
-                        Y = csv.writer(Y, delimiter=',')
-                        Y.writerow([str(row[aux0]), str(row[aux1]), str(row[aux2]), str(row[aux3]), 'Latitude', 'Longitude'])
+                with open(os.path.join(os.path.dirname(__file__), 'latLngInfo08012018.txt'), 'a') as outputFileLatLng:
+                    if row[client_id] == 'client_id':
+                        outputFileLatLng = csv.writer(outputFileLatLng, delimiter=',')
+                        outputFileLatLng.writerow([str(row[client_id]), str(row[client]), str(row[addressNumber]), str(row[address]), 'Latitude', 'Longitude'])
                     else:
-                        Y = csv.writer(Y, delimiter=',')
-                        Y.writerow([str(row[aux0]), str(row[aux1]), str(row[aux2]), str(row[aux3]), str(lat), str(lng)])
-
-class Osmr_Api():
-    pass
+                        outputFileLatLng = csv.writer(outputFileLatLng, delimiter=',')
+                        outputFileLatLng.writerow([str(row[client_id]), str(row[client]), str(row[addressNumber]), str(row[address]), str(lat), str(lng)])
 
 
 X = GoogleMapsInfo('zetamixClientAddresses.txt')
