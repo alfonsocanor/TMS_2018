@@ -1,0 +1,142 @@
+{% extends "bootstrap/base.html" %}
+{% block content %}
+
+<html>
+<head>
+
+        <title>Simple Map</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+        <style>
+          /* Always set the map height explicitly to define the size of the div
+           * element that contains the map. */
+          #map {
+            height: 50%;
+            width: 50%;
+            margin: auto;
+            border: 3px solid rgb(7, 1, 1);
+          }
+          /* Optional: Makes the sample page fill the window. */
+          html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+          }
+        </style>
+
+
+
+    <style>
+        table, th, td {
+            background: #f5f5f5;
+            border-collapse: separate;
+            box-shadow: inset 0 1px 0 #fff;
+            font-size: 12px;
+            line-height: 24px;
+            margin: auto;
+            text-align: left;
+            width: 800px;
+
+        }
+        .center {
+            text-align: center;
+            margin: auto;
+            width: 80%;
+            border: 3px solid rgba(0, 0, 0, 0);
+            padding: 20px;
+        }
+        .footer {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            padding: 1rem;
+            background-color: #efefef00;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+        <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav">
+                    <a class="navbar-brand"> TMS </a>
+                    <li><a href="/routing">Routing</a></li>
+                    </ul>
+                </div>  
+        </nav>
+
+<table>
+    <tr>
+        <th>Client name</th>
+        <th>Distance meters</th>
+    </tr>
+    {% for i in routingPost %}
+    <tr>
+    <td>     
+        {{ i[1] }}
+
+    </td>
+    <td>
+        {{ i[2] }}
+    </td>
+  </tr>
+    {% endfor %}
+    </table>
+
+</form>
+
+<!-- <div id="map"></div>
+<script>
+  function initMap() {
+    // Create a map object and specify the DOM element for display.
+    var map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: -34.596362, lng: -58.420977},
+      zoom: 15, 
+    });
+  }
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMwXuzxKO2EY2eoNX163Iojydhmi39i1U&callback=initMap" async defer></script>-->
+
+<div id="map"></div>
+<script>
+  function initMap() {
+    var chicago = {lat: -34.596379, lng: -58.420967};
+    var indianapolis = {lat: -34.5868558, lng: -58.4190969};
+
+    var map = new google.maps.Map(document.getElementById('map'), {
+      center: chicago,
+      zoom: 7
+    });
+
+    var directionsDisplay = new google.maps.DirectionsRenderer({
+      map: map
+    });
+
+    // Set destination, origin and travel mode.
+    var request = {
+      destination: indianapolis,
+      origin: chicago,
+      travelMode: 'DRIVING'
+    };
+
+    // Pass the directions request to the directions service.
+    var directionsService = new google.maps.DirectionsService();
+    directionsService.route(request, function(response, status) {
+      if (status == 'OK') {
+        // Display the route on the map.
+        directionsDisplay.setDirections(response);
+      }
+    });
+  }
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMwXuzxKO2EY2eoNX163Iojydhmi39i1U&callback=initMap"
+    async defer></script>
+
+</body>
+
+</html>
+{% endblock %}

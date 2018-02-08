@@ -13,19 +13,35 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 class Reference(FlaskForm):
-    test = BooleanField()
+    submit = BooleanField()
 
 class Route():
-    def __init__(self, routeSheetFileName, distancesFileName): #1.Route sheet 2.Distances matrix 3.File Routed due Disjkstra's Algorithm
+    def __init__(self, routeSheetFileName): #1.Route sheet 2.Distances matrix 3.File Routed due Disjkstra's Algorithm
         self.routeSheetFileName = routeSheetFileName
-        self.distancesFileName =  distancesFileName
         self.time = strftime("%Y%m%d_%H%M%S")
         self.routedFileName = 'Route_'+self.time
 
 #   def startPoint(self, starPoint):
 #       starPoint =
 
-    def routing1(self):
+    def showRouteSheet(self):
+        self.clientsRouteList = [['1', '0001_1', 'ZETAMIX']]
+        with open(os.path.join(os.path.dirname(__file__), self.routeSheetFileName)) as clientsRouteFile:
+            clientsRouteFile = csv.reader(clientsRouteFile)
+            for row in clientsRouteFile:
+                self.clientsRouteList.append(row)
+
+        #This with open('w') is used to save the name of the program the user charge through HTML
+        #in a file with a default name that later is used for "routingOperation" method in this same class Route
+        with open(os.path.join(os.path.dirname(__file__), 'startPointFileConditional.csv'), 'w') as startPointFileConditional:
+            startPointFileConditional = csv.writer(startPointFileConditional)
+            startPointFileConditional.writerow([self.routeSheetFileName]) 
+
+        return self.clientsRouteList
+
+    def routingOperation(self, startPoint, distancesFileName):
+        self.startPoint = startPoint
+        self.distancesFileName =  distancesFileName
         self.distancesRouteDict = {}
         self.distancesRouteList = []
         self.minDistance = 0
@@ -56,10 +72,11 @@ class Route():
             with open(os.path.join(os.path.dirname(__file__), self.distancesFileName)) as lookingUpClientInfo:
                 lookingUpClientInfo = csv.reader(lookingUpClientInfo)
                 for row_k in lookingUpClientInfo:
+                    print(row_k)
                     if row_k[1] == self.startPoint + self.minDistance:
                         with open(os.path.join(os.path.dirname(__file__), self.routedFileName), 'a') as routeFile:
                             routeFile = csv.writer(routeFile, delimiter=',')
-                            routeFile.writerow([self.startPoint+row_k[4], row_k[5], row_k[6]])
+                            routeFile.writerow([self.startPoint+row_k[4], row_k[5], row_k[6], row_k[4]])
             self.startPoint = self.minDistance  
             self.distancesRouteDict = {}
             self.routes += 1
@@ -68,39 +85,69 @@ class Route():
             routing_HTML_Table = csv.reader(routing_HTML_Table)
             for row in routing_HTML_Table:
                 routingList.append(row)
-        with open(os.path.join(os.path.dirname(__file__), 'startPointFileConditional.csv'), 'w') as startPointFileConditional:
-            startPointFileConditional = csv.writer(startPointFileConditional)
-            startPointFileConditional.writerow([self.routeSheetFileName])
         return routingList
 
 
-@app.route('/home')
-def home():
-    return 'Test'
+@app.route('/routed')
+def routed():
+    return 'submit'
 
 
 @app.route('/routing', methods=['GET', 'POST'])
 def routing():
-    test = Reference()
+    submit = Reference()
     if request.method == 'POST':
         directory = os.path.join(APP_ROOT)
-        ifHTMLConditional = False
+        ifDisplayHTMLConditional = False
         if not os.path.isdir(directory):
             os.mkdir(directory)
         for file in request.files.getlist("file"):
             filename = file.filename
             destination = "/".join([directory, filename])
-            print(file.filename)
             if file.filename != '':
                 file.save(destination)
-                objectFromClassRoute = Route(filename, 'totalDistances_AB_BA_12012018.csv')
-                returnFromObjectClassRoute = objectFromClassRoute.routing1()
-                ifHTMLConditional = True
-                print(file.filename)
-        if test.validate_on_submit():
-            print(file.filename, 'and this is?')
-            return redirect ('/home')
-        return render_template('routing.html', test=test, returnFromObjectClassRoute=returnFromObjectClassRoute, ifHTMLConditional=ifHTMLConditional)
+                clientsInRouteSheet = Route(filename)
+                showClientsInRouteSheet = clientsInRouteSheet.showRouteSheet()
+                ifDisplayHTMLConditional = True
+        if submit.validate_on_submit():
+
+        ####Start
+
+            #This is code is used to transform the return of the request.form.getlist("showClientsInRouteSheet")
+            #from the template routing.html => ["['12', '1499_3', 'ROMERO CARLOS ENRIQUE']"]
+            #into a value that the class routing can take in its contructor attribute "startPoint""
+            startPointConditional = request.form.getlist("showClientsInRouteSheet")
+            startPointList = []
+            fixingStartPoint = startPointConditional[0].replace(' ','')
+            aux_1 = '' #aux_1 variable is used to handle method replace to modifide the string as the class need
+            for i in fixingStartPoint:
+                aux_1 = aux_1 + i
+            aux_1 = aux_1.replace('[', '')
+            aux_1 = aux_1.replace(']', '')
+            aux_2 = '' #aux_2 variable is used in the conditional to create the list for getting the value of the ID client
+            for i in aux_1:
+                if i != ',':
+                    aux_2 = aux_2 + i
+                else:
+                    startPointList.append(aux_2)
+            startPoint = startPointList[1].replace("'", '')
+
+        ####Finish
+
+            #looking for the name of the routeSheet
+
+            with open(os.path.join(os.path.dirname(__file__), 'startPointFileConditional.csv')) as fileNameRequest:
+                fileNameRequest = csv.reader(fileNameRequest)
+                for i in fileNameRequest:
+                    routeSheetFileName = i[0]
+
+            #DO TO: Friday 02/02/2018
+
+            routing = Route(routeSheetFileName)
+            routingPost = routing.routingOperation(startPoint, 'totalDistances_AB_BA_12012018.csv' )                  
+
+            return render_template('routed.html', routingPost=routingPost)
+        return render_template('routing.html', submit=submit, showClientsInRouteSheet=showClientsInRouteSheet, ifDisplayHTMLConditional=ifDisplayHTMLConditional)
     return render_template('routing.html')
 
 if __name__=='__main__':
