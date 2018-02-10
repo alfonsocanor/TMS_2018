@@ -1,0 +1,27 @@
+<html>
+    <head>
+    </head>
+    <body>
+    <form method='POST' action="{{ url_for('home') }}">
+        {{ test.csrf_token }}
+        {% for i in test %}
+
+        {% if i not in selected_contacts1 %}
+        <input type="checkbox" action='submit' name="test" value="{{i}}" onchange="this.form.submit()">
+        <label>{{i}}</label>
+        {% elif i == selected_contacts1[0]   %}
+        <input type="checkbox" action='submit' name="test" value="{{i}}" checked="checked" onchange="this.form.submit()">
+        <label>{{i}}</label>
+        {% elif i == selected_contacts1[1]   %}
+        <input type="checkbox" action='submit' name="test" value="{{i}}" checked="checked" onchange="this.form.submit()">
+        <label>{{i}}</label>
+        {% endif %}
+
+        {% endfor %}
+    <input type="submit" action="submit" >
+    </form>
+    <p>oajoiajoisjoijo HOLLLAAA</p>
+    {{ selected_contacts1[0] }}
+    {{ selected_contacts1[1] }}
+    </body>
+</html>
